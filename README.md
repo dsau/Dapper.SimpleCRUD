@@ -19,14 +19,18 @@ This extension adds the following 8 helpers:
 - GetList&lt;Type&gt;() - gets list of records all records from a table
 - GetList&lt;Type&gt;(anonymous object for where clause) - gets list of all records matching the where options
 - GetList&lt;Type&gt;(string for conditions) - gets list of all records matching the conditions
+- GetList&lt;Type&gt;(string for conditions, anonymous object for parameters) - gets list of all records matching the conditions
 - GetListPaged&lt;Type&gt;(int pagenumber, int itemsperpage, string for conditions, string for order) - gets paged list of all records matching the conditions
+- GetListPaged&lt;Type&gt;(int pagenumber, int itemsperpage, string for conditions, anonymous object for parameters, string for order) - gets paged list of all records matching the conditions
 - Insert(entity) - Inserts a record and returns the new primary key
 - Update(entity) - Updates a record
 - Delete&lt;Type&gt;(id) - Deletes a record based on primary key
 - Delete(entity) - Deletes a record based on the typed entity
 - DeleteList&lt;Type&gt;(anonymous object for where clause) - deletes all records matching the where options
 - DeleteList&lt;Type&gt;(string for conditions) - deletes list of all records matching the conditions
-- RecordCount&lt;Type&gt;(string for conditions) -gets count of all records matching the conditions 
+- DeleteList&lt;Type&gt;(string for conditions, anonymous object for parameters) - deletes list of all records matching the conditions
+- RecordCount&lt;Type&gt;(string for conditions) -gets count of all records matching the conditions
+- RecordCount&lt;Type&gt;(string for conditions, anonymous object for parameters) -gets count of all records matching the conditions  
 
 
 For projects targeting .NET 4.5 or later, the following 8 helpers exist for async operations:
@@ -35,14 +39,18 @@ For projects targeting .NET 4.5 or later, the following 8 helpers exist for asyn
 - GetListAsync&lt;Type&gt;() - gets list of records all records from a table
 - GetListAsync&lt;Type&gt;(anonymous object for where clause) - gets list of all records matching the where options
 - GetListAsync&lt;Type&gt;(string for conditions) - gets list of all records matching the conditions
+- GetListAsync&lt;Type&gt;(string for conditions, anonymous object for parameters) - gets list of all records matching the conditions
 - GetListPagedAsync&lt;Type&gt;(int pagenumber, int itemsperpage, string for conditions, string for order)  - gets paged list of all records matching the conditions
+- GetListPagedAsync&lt;Type&gt;(int pagenumber, int itemsperpage, string for conditions, string for order, anonymous object for parameters)  - gets paged list of all records matching the conditions
 - InsertAsync(entity) - Inserts a record and returns the new primary key
 - UpdateAsync(entity) - Updates a record
 - DeleteAsync&lt;Type&gt;(id) - Deletes a record based on primary key
 - DeleteAsync(entity) - Deletes a record based on the typed entity
 - DeleteListAsync&lt;Type&gt;(anonymous object for where clause) - deletes all records matching the where options
 - DeleteListAsync&lt;Type&gt;(string for conditions) - deletes list of all records matching the conditions
-- RecordCountAsync&lt;Type&gt;(string for conditions) -gets count of all records matching the conditions 
+- DeleteListAsync&lt;Type&gt;(string for conditions, anonymous object for parameters) - deletes list of all records matching the conditions
+- RecordCountAsync&lt;Type&gt;(string for conditions) -gets count of all records matching the conditions
+- RecordCountAsync&lt;Type&gt;(string for conditions, anonymous object for parameters) -gets count of all records matching the conditions 
 
 If you need something more complex use Dapper's Query or Execute methods!
 

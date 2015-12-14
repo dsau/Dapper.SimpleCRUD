@@ -192,6 +192,26 @@ namespace Dapper
         /// <returns>Gets a list of entities with optional SQL where conditions</returns>
         public static IEnumerable<T> GetList<T>(this IDbConnection connection, string conditions, IDbTransaction transaction = null, int? commandTimeout = null)
         {
+            return GetList<T>(connection, conditions, null, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// <para>By default queries the table matching the class name</para>
+        /// <para>-Table name can be overridden by adding an attribute on your class [Table("YourTableName")]</para>
+        /// <para>conditions is an SQL where clause and/or order by clause ex: "where name=@Name"</para>
+        /// <para>parameters is an anonymous type containing the parameters for the conditions ex: new {Name = "Bob"}</para>
+        /// <para>Supports transaction and command timeout</para>
+        /// <para>Returns a list of entities that match where conditions</para>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="conditions"></param>
+        /// <param name="parameters"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>Gets a list of entities with optional SQL where conditions</returns>
+        public static IEnumerable<T> GetList<T>(this IDbConnection connection, string conditions, object parameters, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
             var currenttype = typeof(T);
             var idProps = GetIdProperties(currenttype).ToList();
             if (!idProps.Any())
@@ -210,8 +230,9 @@ namespace Dapper
             if (Debugger.IsAttached)
                 Trace.WriteLine(String.Format("GetList<{0}>: {1}", currenttype, sb));
 
-            return connection.Query<T>(sb.ToString(),null, transaction, true, commandTimeout);
+            return connection.Query<T>(sb.ToString(), parameters, transaction, true, commandTimeout);
         }
+
 
         /// <summary>
         /// <para>By default queries the table matching the class name</para>
@@ -245,6 +266,30 @@ namespace Dapper
         /// <returns>Gets a paged list of entities with optional exact match where conditions</returns>
         public static IEnumerable<T> GetListPaged<T>(this IDbConnection connection, int pageNumber, int rowsPerPage, string conditions, string orderby, IDbTransaction transaction = null, int? commandTimeout = null)
         {
+            return GetListPaged<T>(connection, pageNumber, rowsPerPage, conditions, orderby, null, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// <para>By default queries the table matching the class name</para>
+        /// <para>-Table name can be overridden by adding an attribute on your class [Table("YourTableName")]</para>
+        /// <para>conditions is an SQL where clause ex: "where name=@Name"</para>
+        /// <para>parameters is an anonymous type containing the parameters for the conditions ex: new {Name = "Bob"}</para>
+        /// <para>orderby is a column or list of columns to order by ex: "lastname, age desc" - not required - default is by primary key</para>
+        /// <para>Supports transaction and command timeout</para>
+        /// <para>Returns a list of entities that match where conditions</para>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="rowsPerPage"></param>
+        /// <param name="conditions"></param>
+        /// <param name="orderby"></param>
+        /// <param name="parameters"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>Gets a paged list of entities with optional exact match where conditions</returns>
+        public static IEnumerable<T> GetListPaged<T>(this IDbConnection connection, int pageNumber, int rowsPerPage, string conditions, string orderby, object parameters, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
             if (string.IsNullOrEmpty(_getPagedListSql))
                 throw new Exception("GetListPage is not supported with the current SQL Dialect");
 
@@ -272,12 +317,12 @@ namespace Dapper
             query = query.Replace("{RowsPerPage}", rowsPerPage.ToString());
             query = query.Replace("{OrderBy}", orderby);
             query = query.Replace("{WhereClause}", conditions);
-            query = query.Replace("{Offset}", ((pageNumber - 1) * rowsPerPage).ToString());  
+            query = query.Replace("{Offset}", ((pageNumber - 1) * rowsPerPage).ToString());
 
             if (Debugger.IsAttached)
                 Trace.WriteLine(String.Format("GetListPaged<{0}>: {1}", currenttype, query));
 
-            return connection.Query<T>(query, null, transaction, true, commandTimeout);
+            return connection.Query<T>(query, parameters, transaction, true, commandTimeout);
         }
 
         /// <summary>
@@ -545,6 +590,28 @@ namespace Dapper
         /// <returns>The number of records effected</returns>
         public static int DeleteList<T>(this IDbConnection connection, string conditions, IDbTransaction transaction = null, int? commandTimeout = null)
         {
+            return DeleteList<T>(connection, conditions, null, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// <para>Deletes a list of records in the database</para>
+        /// <para>By default deletes records in the table matching the class name</para>
+        /// <para>-Table name can be overridden by adding an attribute on your class [Table("YourTableName")]</para>
+        /// <para>Deletes records where that match the where clause</para>
+        /// <para>conditions is an SQL where clause ex: "where name=@Name"</para>
+        /// <para>parameters is an anonymous type containing the parameters for the conditions ex: new {Name = "Bob"}</para>
+        /// <para>The number of records effected</para>
+        /// <para>Supports transaction and command timeout</para>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="conditions"></param>
+        /// <param name="parameters"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>The number of records effected</returns>
+        public static int DeleteList<T>(this IDbConnection connection, string conditions, object parameters, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
             if (string.IsNullOrEmpty(conditions))
                 throw new ArgumentException("DeleteList<T> requires a where clause");
             if (!conditions.ToLower().Contains("where"))
@@ -560,7 +627,7 @@ namespace Dapper
             if (Debugger.IsAttached)
                 Trace.WriteLine(String.Format("DeleteList<{0}> {1}", currenttype, sb));
 
-            return connection.Execute(sb.ToString(), null, transaction, commandTimeout);
+            return connection.Execute(sb.ToString(), parameters, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -578,6 +645,26 @@ namespace Dapper
         /// <returns>Returns a count of records.</returns>
         public static int RecordCount<T>(this IDbConnection connection, string conditions = "", IDbTransaction transaction = null, int? commandTimeout = null)
         {
+            return RecordCount<T>(connection, conditions, null, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// <para>By default queries the table matching the class name</para>
+        /// <para>-Table name can be overridden by adding an attribute on your class [Table("YourTableName")]</para>
+        /// <para>Returns a number of records entity by a single id from table T</para>
+        /// <para>Supports transaction and command timeout</para>
+        /// <para>conditions is an SQL where clause ex: "where name=@Name"</para>
+        /// <para>parameters is an anonymous type containing the parameters for the conditions ex: new {Name = "Bob"}</para>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="conditions"></param>
+        /// <param name="parameters"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns>Returns a count of records.</returns>
+        public static int RecordCount<T>(this IDbConnection connection, string conditions, object parameters, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
             var currenttype = typeof(T);
             var name = GetTableName(currenttype);
             var sb = new StringBuilder();
@@ -588,7 +675,7 @@ namespace Dapper
             if (Debugger.IsAttached)
                 Trace.WriteLine(String.Format("RecordCount<{0}>: {1}", currenttype, sb));
 
-            return connection.Query<int>(sb.ToString(), null, transaction, true, commandTimeout).Single();
+            return connection.Query<int>(sb.ToString(), parameters, transaction, true, commandTimeout).Single();
         }
 
         //build update statement based on list on an entity
